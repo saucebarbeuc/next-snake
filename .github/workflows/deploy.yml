@@ -1,0 +1,31 @@
+name: CD / Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: desktest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+
+      - name: build image
+        run: >
+          docker build -t snake .
+
+  run :
+    runs-on: desktest
+    steps:
+      - uses: actions/download-artifact@v4
+
+      - name : Run build
+        run:  >
+          docker run 
+          --publish 2411:3000
+          --detach
+          --restart always
+          --name snake
+          --init
+          snake
