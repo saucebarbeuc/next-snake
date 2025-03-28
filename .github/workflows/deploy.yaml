@@ -1,10 +1,10 @@
-name: CD / Deploy
+name: CD / Run / deploy
 
 on:
   workflow_dispatch:
-    push:
-      branches:
-        - main
+  push:
+    branches:
+      - main
 
 jobs:
   publish:
@@ -14,16 +14,16 @@ jobs:
       packages: write
 
     steps:
-        - name: Checkout repository
-          uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-        - name: Build Docker image
-          run: docker build . --file Dockerfile --tag next-snake:${{ github.run_number }}
+      - name: Build Docker image
+        run: docker build . --file Dockerfile --tag next-snake:${{ github.run_number }}
 
-        - name: Stop and remove existing container
-          run: |
-            docker stop next-snake || true
-            docker rm next-snake || true
+      - name: Stop and remove existing container
+        run: |
+          docker stop next-snake || true
+          docker rm next-snake || true
 
-        - name: Run Docker container
-          run: docker run -d -p 2411:3000 --name next-snake next-snake:${{ github.run_number }}
+      - name: Run Docker container
+        run: docker run -d -p 2411:3000 --name next-snake next-snake:${{ github.run_number }}
