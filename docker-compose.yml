@@ -1,13 +1,10 @@
-version: "3.5"
+version: "3.8"
 
 services:
   snake:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    container_name: 'next-snake'
     ports:
       - "2411:3000"
-
-networks:
-  tabuleo-network:
-    external: true
+    build:
+      context: .
+    restart: no

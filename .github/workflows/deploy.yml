@@ -2,30 +2,28 @@ name: CD / Deploy
 
 on:
   workflow_dispatch:
+    push:
+      branches:
+        - main
 
 jobs:
-  build:
+  publish:
     runs-on: self-hosted
+    permissions:
+      contents: read
+      packages: write
+
     steps:
-      - uses: actions/checkout@v4
+        - name: Checkout repository
+          uses: actions/checkout@v2
 
-      - uses: actions/download-artifact@v4
+        - name: Build Docker image
+          run: docker build . --file Dockerfile --tag next-snake:${{ github.run_number }}
 
-      - name: build image
-        run: >
-          docker build -t snake .
+        - name: Stop and remove existing container
+          run: |
+            docker stop next-snake || true
+            docker rm next-snake || true
 
-  run :
-    runs-on: desktest
-    steps:
-      - uses: actions/download-artifact@v4
-
-      - name : Run build
-        run:  >
-          docker run 
-          --publish 2411:3000
-          --detach
-          --restart always
-          --name snake
-          --init
-          snake
+        - name: Run Docker container
+          run: docker run -d -p 2411:3000 --name next-snake next-snake:${{ github.run_number }}
